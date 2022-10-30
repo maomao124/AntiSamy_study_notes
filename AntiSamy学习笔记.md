@@ -1225,34 +1225,34 @@ AntiSamy对“恶意代码”的过滤依赖于策略文件。策略文件规定
 
 
 
-antisamy.xml
+**antisamy.xml**
 
 默认规则，允许大部分HTML通过
 
 
 
-antisamy-slashdot.xml 
+**antisamy-slashdot.xml** 
 用户只能提交下列的html标签：<b>, <u>, <i>, <a>, <blockquote>。
 
 
 
-antisamy-ebay.xml
+**antisamy-ebay.xml**
 用户可以输入一系列的HTML的内容，不包含JavaScript。
 
 
 
-antisamy-myspace.xml
+**antisamy-myspace.xml**
 
 更多的HTML和CSS，只要不包含JavaScript。
 
 
 
-antisamy-anythinggoes.xml
+**antisamy-anythinggoes.xml**
 更多的HTML和CSS元素输入，但不包含JavaScript。
 
 
 
-antisamy-tinymce.xml
+**antisamy-tinymce.xml**
 
 只允许文本格式通过，相对较安全
 
@@ -2341,6 +2341,297 @@ public class StudentController
 
 
 **以下是解决方案3**
+
+
+
+
+
+#### 第十八步：编写类XssStringJsonDeserializer
+
+
+
+```java
+package mao.antisamy_demo.converter;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import mao.antisamy_demo.service.XssFilterService;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：AntiSamy_spring_boot_starter_demo
+ * Package(包名): mao.tools_xss.converter
+ * Class(类名): XssStringJsonDeserializer
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/30
+ * Time(创建时间)： 20:14
+ * Version(版本): 1.0
+ * Description(描述)： 过滤跨站脚本的 反序列化工具
+ */
+
+public class XssStringJsonDeserializer extends JsonDeserializer<String>
+{
+
+    private final XssFilterService xssFilterService;
+
+    public XssStringJsonDeserializer(XssFilterService xssFilterService)
+    {
+        this.xssFilterService = xssFilterService;
+    }
+
+    @Override
+    public String deserialize(JsonParser p, DeserializationContext dc) throws IOException, JsonProcessingException
+    {
+        if (p.hasToken(JsonToken.VALUE_STRING))
+        {
+            String value = p.getValueAsString();
+
+            if (value == null || "".equals(value))
+            {
+                return value;
+            }
+
+            List<String> list = new ArrayList<>();
+            list.add("<script>");
+            list.add("</script>");
+            list.add("<iframe>");
+            list.add("</iframe>");
+            list.add("<noscript>");
+            list.add("</noscript>");
+            list.add("<frameset>");
+            list.add("</frameset>");
+            list.add("<frame>");
+            list.add("</frame>");
+            list.add("<noframes>");
+            list.add("</noframes>");
+            boolean flag = list.stream().anyMatch(value::contains);
+            if (flag)
+            {
+                return xssFilterService.xssClean(value);
+            }
+            return value;
+        }
+        return null;
+    }
+}
+```
+
+
+
+
+
+#### 第十九步：修改配置类AntiSamyConfig
+
+
+
+```java
+package mao.antisamy_demo.config;
+
+import mao.antisamy_demo.converter.XssStringJsonDeserializer;
+import mao.antisamy_demo.filter.XssFilter;
+import mao.antisamy_demo.service.XssFilterService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.servlet.DispatcherType;
+
+/**
+ * Project name(项目名称)：antiSamy_demo
+ * Package(包名): mao.antisamy_demo.config
+ * Class(类名): AntiSamyConfig
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/30
+ * Time(创建时间)： 13:53
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+@Configuration
+public class AntiSamyConfig
+{
+    @Bean
+    public FilterRegistrationBean<XssFilter> filterRegistrationBean()
+    {
+        FilterRegistrationBean<XssFilter> filterRegistration = new FilterRegistrationBean<>(new XssFilter());
+        filterRegistration.addUrlPatterns("/*");
+        filterRegistration.setDispatcherTypes(DispatcherType.REQUEST);
+        filterRegistration.setName("xssFilter");
+        filterRegistration.setOrder(1);
+
+        return filterRegistration;
+    }
+
+    /**
+     * 配置跨站攻击 反序列化处理器
+     *
+     * @return Jackson2ObjectMapperBuilderCustomizer
+     */
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer2(@Autowired XssFilterService xssFilterService)
+    {
+        return builder -> builder.deserializerByType(String.class, new XssStringJsonDeserializer(xssFilterService));
+    }
+
+}
+```
+
+
+
+
+
+
+
+#### 第二十步：修改StudentController
+
+
+
+```java
+package mao.antisamy_demo.controller;
+
+import mao.antisamy_demo.entity.Student;
+import mao.antisamy_demo.service.XssFilterService;
+import mao.antisamy_demo.wrapper.XssRequestWrapper;
+import org.apache.juli.logging.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：antiSamy_demo
+ * Package(包名): mao.antisamy_demo.controller
+ * Class(类名): StudentController
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/29
+ * Time(创建时间)： 20:05
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+@RestController
+@RequestMapping("/student")
+public class StudentController
+{
+    private static final List<Student> list = Collections.synchronizedList(new ArrayList<>());
+
+    private static final Logger log = LoggerFactory.getLogger(StudentController.class);
+
+    @Autowired
+    private XssFilterService xssFilterService;
+
+    @PostMapping("/init")
+    public synchronized void init()
+    {
+        Student student1 = new Student(10001, "张三", "男", 18);
+        Student student2 = new Student(10002, "李四", "女", 16);
+        Student student3 = new Student(10003, "王五", "男", 20);
+        list.clear();
+        list.add(student1);
+        list.add(student2);
+        list.add(student3);
+        log.info("初始化完成");
+    }
+
+    @PostMapping
+    public boolean save(@RequestBody Student student)
+    {
+        list.add(student);
+        log.info("添加成功：\n" + student);
+        return true;
+    }
+
+
+//    @PostMapping
+//    public boolean save(@RequestBody Student student)
+//    {
+//        student.setName(xssFilterService.xssClean(student.getName()));
+//        student.setSex(xssFilterService.xssClean(student.getSex()));
+//
+//        list.add(student);
+//        log.info("添加成功：\n" + student);
+//        return true;
+//    }
+
+
+    @PostMapping("/sync")
+    public boolean saveSync(Student student)
+    {
+        list.add(student);
+        log.info("添加成功：\n" + student);
+        return true;
+    }
+
+    @GetMapping
+    public List<Student> getAll()
+    {
+        log.info("查询所有：\n" + list);
+        return list;
+    }
+
+}
+```
+
+
+
+
+
+
+
+#### 第二十一步：重启并访问服务
+
+
+
+![image-20221030211505307](img/AntiSamy学习笔记/image-20221030211505307.png)
+
+
+
+
+
+
+
+![image-20221030211754210](img/AntiSamy学习笔记/image-20221030211754210.png)
+
+
+
+
+
+![image-20221030211816163](img/AntiSamy学习笔记/image-20221030211816163.png)
+
+
+
+
+
+可以看到标签成功地被过滤掉了
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3456,6 +3747,12 @@ logging:
 ```
 
 
+
+
+
+
+
+第六步：启动程序
 
 
 
