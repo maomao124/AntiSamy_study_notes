@@ -1,3 +1,25 @@
+[TOC]
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2663,7 +2685,7 @@ public class StudentController
 
 
 
-第一步：初始化项目
+#### 第一步：初始化项目
 
 
 
@@ -2697,7 +2719,7 @@ public class StudentController
 
 
 
-第二步：修改pom文件
+#### 第二步：修改pom文件
 
 
 
@@ -2896,7 +2918,7 @@ public class StudentController
 
 
 
-第三步：编写工具类XssUtils
+#### 第三步：编写工具类XssUtils
 
 
 
@@ -3047,7 +3069,7 @@ public class XssUtils
 
 
 
-第四步：编写类XssRequestWrapper
+#### 第四步：编写类XssRequestWrapper
 
 
 
@@ -3153,7 +3175,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper
 
 
 
-第五步：编写类XssStringJsonDeserializer 
+#### 第五步：编写类XssStringJsonDeserializer 
 
 
 
@@ -3255,7 +3277,7 @@ public class XssStringJsonDeserializer extends JsonDeserializer<String>
 
 
 
-第六步：编写过滤器类XssFilter
+#### 第六步：编写过滤器类XssFilter
 
 
 
@@ -3414,7 +3436,7 @@ public class XssFilter implements Filter
 
 
 
-第七步：拷贝之前的service包到此项目中，并更改
+#### 第七步：拷贝之前的service包到此项目中，并更改
 
 
 
@@ -3501,7 +3523,7 @@ public class XssFilterService
 
 
 
-第八步：编写配置类XssAuthConfiguration
+#### 第八步：编写配置类XssAuthConfiguration
 
 
 
@@ -3598,7 +3620,7 @@ public class XssAuthConfiguration
 
 
 
-第九步：拷贝antisamy-slashdot-1.4.4.xml文件和antisamy.xsd文件到资源目录中
+#### 第九步：拷贝antisamy-slashdot-1.4.4.xml文件和antisamy.xsd文件到资源目录中
 
 
 
@@ -3612,7 +3634,7 @@ public class XssAuthConfiguration
 
 
 
-第十步：编写spring.factories文件
+#### 第十步：编写spring.factories文件
 
 
 
@@ -3643,7 +3665,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 
 
-第一步：导入tools-xss的依赖
+#### 第一步：导入tools-xss的依赖
 
 
 
@@ -3704,7 +3726,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 
 
-第二步：导入之前项目的静态资源文件
+#### 第二步：导入之前项目的静态资源文件
 
 
 
@@ -3714,7 +3736,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 
 
-第三步：拷贝antisamy-slashdot-1.4.4.xml文件和antisamy.xsd文件到资源目录中
+#### 第三步：拷贝antisamy-slashdot-1.4.4.xml文件和antisamy.xsd文件到资源目录中
 
 
 
@@ -3726,7 +3748,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 
 
-第四步：拷贝之前的controller和entity包到此项目中
+#### 第四步：拷贝之前的controller和entity包到此项目中
 
 
 
@@ -3736,7 +3758,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 
 
-第五步：修改配置文件application.yml
+#### 第五步：修改配置文件application.yml
 
 
 
@@ -3778,7 +3800,7 @@ logging:
 
 
 
-第六步：启动程序
+#### 第六步：启动程序
 
 
 
@@ -3815,7 +3837,7 @@ logging:
 
 
 
-第七步：访问
+#### 第七步：访问
 
 
 
@@ -3930,3 +3952,40 @@ age：9
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+end
+
+---
+
+by mao
+
+2022  10  30
+
+---
