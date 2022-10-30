@@ -1142,7 +1142,7 @@ http://localhost:8080/
 
 
 
-第一步：添加依赖
+#### 第一步：添加依赖
 
 
 
@@ -1203,7 +1203,7 @@ http://localhost:8080/
 
 
 
-第二步：创建策略文件/resources/antisamy.xml
+#### 第二步：创建策略文件/resources/antisamy.xml
 
 
 
@@ -1266,7 +1266,7 @@ antisamy-tinymce.xml
 
 
 
-第三步：创建过滤器，用于过滤所有提交到服务器的请求参数
+#### 第三步：创建过滤器，用于过滤所有提交到服务器的请求参数
 
 
 
@@ -1316,7 +1316,7 @@ public class XssFilter implements Filter
 
 
 
-第四步：创建XssRequestWrapper类
+#### 第四步：创建XssRequestWrapper类
 
 
 
@@ -1427,7 +1427,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper
 
 
 
-第五步：使上面定义的过滤器生效，创建配置类，用于初始化过滤器对象
+#### 第五步：使上面定义的过滤器生效，创建配置类，用于初始化过滤器对象
 
 
 
@@ -1480,7 +1480,7 @@ public class AntiSamyConfig
 
 
 
-第六步：复制antisamy-ebay.xml文件到/resources目录下
+#### 第六步：复制antisamy-ebay.xml文件到/resources目录下
 
 
 
@@ -1492,7 +1492,7 @@ public class AntiSamyConfig
 
 
 
-第七步：修改XssRequestWrapper类
+#### 第七步：修改XssRequestWrapper类
 
 
 
@@ -1642,7 +1642,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper
 
 
 
-第八步：启动程序
+#### 第八步：启动程序
 
 
 
@@ -1674,7 +1674,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper
 
 **到了这里，我发现一个问题，那就是无法清理通过请求体传过来json数据的情况，有时候需要将数据封装到请求体中在使用json的格式发送到后端。**
 
-**对此，有两种方案，第一种就是放弃异步提交的方式，采用同步提交，就是传统的表单提交，第二种就是在controller里编写繁琐的业务代码，将没一个字段都过滤一次**
+**对此，有三种方案，第一种就是放弃异步提交的方式，采用同步提交，就是传统的表单提交，第二种就是在controller里编写繁琐的业务代码，将没一个字段都过滤一次，第三种就是重写JsonDeserializer**
 
 
 
@@ -1682,7 +1682,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper
 
 
 
-第九步：访问
+#### 第九步：访问
 
 
 
@@ -1710,7 +1710,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper
 
 
 
-第十步：更改StudentController
+#### 第十步：更改StudentController
 
 
 
@@ -1796,7 +1796,7 @@ public class StudentController
 
 
 
-第十一步：编写save2.html
+#### 第十一步：编写save2.html
 
 
 
@@ -1964,7 +1964,7 @@ Project name(项目名称)：antiSamy_demo
 
 
 
-第十二步：修改index.html
+#### 第十二步：修改index.html
 
 
 
@@ -2056,7 +2056,7 @@ Project name(项目名称)：antiSamy_demo
 
 
 
-第十三步：重启并访问
+#### 第十三步：重启并访问
 
 
 
@@ -2080,7 +2080,7 @@ Project name(项目名称)：antiSamy_demo
 
 
 
-第十四步：查看控制台日志
+#### 第十四步：查看控制台日志
 
 
 
@@ -2110,7 +2110,7 @@ Project name(项目名称)：antiSamy_demo
 
 
 
-第十五步：编写XssFilterService
+#### 第十五步：编写XssFilterService
 
 
 
@@ -2194,7 +2194,7 @@ public class XssFilterService
 
 
 
-第十六步：修改StudentController
+#### 第十六步：修改StudentController
 
 
 
@@ -2296,7 +2296,7 @@ public class StudentController
 
 
 
-第十七步：重启并访问
+#### 第十七步：重启并访问
 
 
 
@@ -2340,6 +2340,12 @@ public class StudentController
 
 
 
+**以下是解决方案3**
+
+
+
+
+
 
 
 
@@ -2363,6 +2369,1093 @@ public class StudentController
 
 
 ### 开发starter
+
+
+
+第一步：初始化项目
+
+
+
+创建父工程AntiSamy_spring_boot_starter_demo
+
+
+
+![image-20221030194811836](img/AntiSamy学习笔记/image-20221030194811836.png)
+
+
+
+
+
+创建子工程tools-xss
+
+
+
+![image-20221030194933108](img/AntiSamy学习笔记/image-20221030194933108.png)
+
+
+
+创建子工程use-starter
+
+
+
+![image-20221030195021648](img/AntiSamy学习笔记/image-20221030195021648.png)
+
+
+
+
+
+
+
+第二步：修改pom文件
+
+
+
+父工程AntiSamy_spring_boot_starter_demo的pom文件：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>AntiSamy_spring_boot_starter_demo</artifactId>
+        <groupId>mao</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>use-starter</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>use-starter</name>
+    <description>use-starter</description>
+
+    <properties>
+
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+
+
+
+
+
+
+子工程tools-xss的pom文件：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>AntiSamy_spring_boot_starter_demo</artifactId>
+        <groupId>mao</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>tools-xss</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>tools-xss</name>
+    <description>tools-xss</description>
+
+    <properties>
+
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--spring boot starter开发依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+        </dependency>
+
+        <!--解决xss攻击-->
+        <dependency>
+            <groupId>org.owasp.antisamy</groupId>
+            <artifactId>antisamy</artifactId>
+            <version>1.5.7</version>
+        </dependency>
+
+        <!--阿里巴巴的FastJson json解析-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.79</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+
+```
+
+
+
+
+
+
+
+子工程use-starter的pom文件：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>AntiSamy_spring_boot_starter_demo</artifactId>
+        <groupId>mao</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>use-starter</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>use-starter</name>
+    <description>use-starter</description>
+
+    <properties>
+
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+
+
+
+
+
+
+
+
+第三步：编写工具类XssUtils
+
+
+
+```java
+package mao.tools_xss.utils;
+
+
+import org.owasp.validator.html.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：AntiSamy_spring_boot_starter_demo
+ * Package(包名): mao.tools_xss.utils
+ * Class(类名): XssUtils
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/30
+ * Time(创建时间)： 20:03
+ * Version(版本): 1.0
+ * Description(描述)： XSS 工具类， 用于过滤特殊字符
+ */
+
+public class XssUtils
+{
+    private static final Logger log = LoggerFactory.getLogger(XssUtils.class);
+
+    private static final String ANTISAMY_SLASHDOT_XML = "antisamy-slashdot-1.4.4.xml";
+    private static Policy policy = null;
+
+    static
+    {
+        log.debug(" start read XSS configfile [" + ANTISAMY_SLASHDOT_XML + "]");
+        InputStream inputStream = XssUtils.class.getClassLoader().getResourceAsStream(ANTISAMY_SLASHDOT_XML);
+        try
+        {
+            policy = Policy.getInstance(inputStream);
+            log.debug("read XSS configfile [" + ANTISAMY_SLASHDOT_XML + "] success");
+        }
+        catch (PolicyException e)
+        {
+            log.error("read XSS configfile [" + ANTISAMY_SLASHDOT_XML + "] fail , reason:", e);
+        }
+        finally
+        {
+            if (inputStream != null)
+            {
+                try
+                {
+                    inputStream.close();
+                }
+                catch (IOException e)
+                {
+                    log.error("close XSS configfile [" + ANTISAMY_SLASHDOT_XML + "] fail , reason:", e);
+                }
+            }
+        }
+    }
+
+    /**
+     * 跨站攻击语句过滤 方法
+     *
+     * @param paramValue           待过滤的参数
+     * @param ignoreParamValueList 忽略过滤的参数列表
+     * @return String
+     */
+    public static String xssClean(String paramValue, List<String> ignoreParamValueList)
+    {
+        AntiSamy antiSamy = new AntiSamy();
+        try
+        {
+            log.debug("raw value before xssClean: " + paramValue);
+            if (isIgnoreParamValue(paramValue, ignoreParamValueList))
+            {
+                log.debug("ignore the xssClean,keep the raw paramValue: " + paramValue);
+                return paramValue;
+            }
+            else
+            {
+                final CleanResults cleanResults = antiSamy.scan(paramValue, policy);
+                cleanResults.getErrorMessages().forEach(log::debug);
+                String str = cleanResults.getCleanHTML();
+                /*String str = StringEscapeUtils.escapeHtml(cleanResults.getCleanHTML());
+                str = str.replaceAll((antiSamy.scan("&nbsp;", policy)).getCleanHTML(), "");
+                str = StringEscapeUtils.unescapeHtml(str);*/
+                /*str = str.replaceAll("&quot;", "\"");
+                str = str.replaceAll("&amp;", "&");
+                str = str.replaceAll("'", "'");
+                str = str.replaceAll("'", "＇");
+
+                str = str.replaceAll("&lt;", "<");
+                str = str.replaceAll("&gt;", ">");*/
+                log.debug("xssfilter value after xssClean" + str);
+
+                return str;
+            }
+        }
+        catch (ScanException e)
+        {
+            log.error("scan failed armter is [" + paramValue + "]", e);
+        }
+        catch (PolicyException e)
+        {
+            log.error("antisamy convert failed  armter is [" + paramValue + "]", e);
+        }
+        return paramValue;
+    }
+
+    /**
+     * 忽略参数值
+     *
+     * @param paramValue           参数值
+     * @param ignoreParamValueList 忽略参数值列表
+     * @return boolean
+     */
+    private static boolean isIgnoreParamValue(String paramValue, List<String> ignoreParamValueList)
+    {
+        if (paramValue == null || paramValue.equals(""))
+        {
+            return true;
+        }
+        if (ignoreParamValueList == null || ignoreParamValueList.size() == 0)
+        {
+            return false;
+        }
+        else
+        {
+            for (String ignoreParamValue : ignoreParamValueList)
+            {
+                if (paramValue.contains(ignoreParamValue))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
+
+```
+
+
+
+
+
+第四步：编写类XssRequestWrapper
+
+
+
+```java
+package mao.tools_xss.wrapper;
+
+import mao.tools_xss.utils.XssUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Project name(项目名称)：AntiSamy_spring_boot_starter_demo
+ * Package(包名): mao.tools_xss.wrapper
+ * Class(类名): XssRequestWrapper
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/30
+ * Time(创建时间)： 20:01
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class XssRequestWrapper extends HttpServletRequestWrapper
+{
+
+    private static final Logger log = LoggerFactory.getLogger(XssRequestWrapper.class);
+
+    private final List<String> ignoreParamValueList;
+
+    public XssRequestWrapper(HttpServletRequest request, List<String> ignoreParamValueList)
+    {
+        super(request);
+        this.ignoreParamValueList = ignoreParamValueList;
+    }
+
+    @Override
+    public Map<String, String[]> getParameterMap()
+    {
+        Map<String, String[]> requestMap = super.getParameterMap();
+        for (Map.Entry<String, String[]> me : requestMap.entrySet())
+        {
+            log.debug(me.getKey() + ":");
+            String[] values = me.getValue();
+            for (int i = 0; i < values.length; i++)
+            {
+                log.debug(values[i]);
+                values[i] = XssUtils.xssClean(values[i], this.ignoreParamValueList);
+            }
+        }
+        return requestMap;
+    }
+
+    @Override
+    public String[] getParameterValues(String paramString)
+    {
+        String[] arrayOfString1 = super.getParameterValues(paramString);
+        if (arrayOfString1 == null)
+        {
+            return null;
+        }
+        int i = arrayOfString1.length;
+        String[] arrayOfString2 = new String[i];
+        for (int j = 0; j < i; j++)
+        {
+            arrayOfString2[j] = XssUtils.xssClean(arrayOfString1[j], this.ignoreParamValueList);
+        }
+        return arrayOfString2;
+    }
+
+    @Override
+    public String getParameter(String paramString)
+    {
+        String str = super.getParameter(paramString);
+        if (str == null)
+        {
+            return null;
+        }
+        return XssUtils.xssClean(str, this.ignoreParamValueList);
+    }
+
+    @Override
+    public String getHeader(String paramString)
+    {
+        String str = super.getHeader(paramString);
+        if (str == null)
+        {
+            return null;
+        }
+        return XssUtils.xssClean(str, this.ignoreParamValueList);
+    }
+}
+```
+
+
+
+
+
+
+
+第五步：编写类XssStringJsonDeserializer 
+
+
+
+```java
+package mao.tools_xss.converter;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import mao.tools_xss.utils.XssUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：AntiSamy_spring_boot_starter_demo
+ * Package(包名): mao.tools_xss.converter
+ * Class(类名): XssStringJsonDeserializer
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/30
+ * Time(创建时间)： 20:14
+ * Version(版本): 1.0
+ * Description(描述)： 过滤跨站脚本的 反序列化工具
+ */
+
+public class XssStringJsonDeserializer extends JsonDeserializer<String>
+{
+    @Override
+    public String deserialize(JsonParser p, DeserializationContext dc) throws IOException, JsonProcessingException
+    {
+        if (p.hasToken(JsonToken.VALUE_STRING))
+        {
+            String value = p.getValueAsString();
+
+            if (value == null || "".equals(value))
+            {
+                return value;
+            }
+
+            List<String> list = new ArrayList<>();
+            list.add("<script>");
+            list.add("</script>");
+            list.add("<iframe>");
+            list.add("</iframe>");
+            list.add("<noscript>");
+            list.add("</noscript>");
+            list.add("<frameset>");
+            list.add("</frameset>");
+            list.add("<frame>");
+            list.add("</frame>");
+            list.add("<noframes>");
+            list.add("</noframes>");
+            boolean flag = list.stream().anyMatch(value::contains);
+            if (flag)
+            {
+                return XssUtils.xssClean(value, null);
+            }
+            return value;
+        }
+        return null;
+    }
+}
+```
+
+
+
+
+
+第六步：编写过滤器类XssFilter
+
+
+
+```java
+package mao.tools_xss.filter;
+
+import com.alibaba.fastjson.JSON;
+import mao.tools_xss.wrapper.XssRequestWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：AntiSamy_spring_boot_starter_demo
+ * Package(包名): mao.tools_xss.filter
+ * Class(类名): XssFilter
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/30
+ * Time(创建时间)： 20:18
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class XssFilter implements Filter
+{
+
+    private static final Logger log = LoggerFactory.getLogger(XssFilter.class);
+
+    /**
+     * 可放行的请求路径
+     */
+    private static final String IGNORE_PATH = "ignorePath";
+    /**
+     * 可放行的参数值
+     */
+    private static final String IGNORE_PARAM_VALUE = "ignoreParamValue";
+    /**
+     * 默认放行单点登录的登出响应(响应中包含samlp:LogoutRequest标签，直接放行)
+     */
+    private static final String CAS_LOGOUT_RESPONSE_TAG = "samlp:LogoutRequest";
+    /**
+     * 可放行的请求路径列表
+     */
+    private List<String> ignorePathList;
+    /**
+     * 可放行的参数值列表
+     */
+    private List<String> ignoreParamValueList;
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException
+    {
+        log.debug("XSS fiter [XSSFilter] init start ...");
+        String ignorePaths = filterConfig.getInitParameter(IGNORE_PATH);
+        String ignoreParamValues = filterConfig.getInitParameter(IGNORE_PARAM_VALUE);
+        if (!(ignorePaths == null || ignorePaths.equals("")))
+        {
+            String[] ignorePathArr = ignorePaths.split(",");
+            ignorePathList = Arrays.asList(ignorePathArr);
+        }
+        if (!(ignoreParamValues == null || ignoreParamValues.equals("")))
+        {
+            String[] ignoreParamValueArr = ignoreParamValues.split(",");
+            ignoreParamValueList = Arrays.asList(ignoreParamValueArr);
+            //默认放行单点登录的登出响应(响应中包含samlp:LogoutRequest标签，直接放行)
+            if (!ignoreParamValueList.contains(CAS_LOGOUT_RESPONSE_TAG))
+            {
+                ignoreParamValueList.add(CAS_LOGOUT_RESPONSE_TAG);
+            }
+        }
+        else
+        {
+            //默认放行单点登录的登出响应(响应中包含samlp:LogoutRequest标签，直接放行)
+            ignoreParamValueList = new ArrayList<>();
+            ignoreParamValueList.add(CAS_LOGOUT_RESPONSE_TAG);
+        }
+        log.debug("ignorePathList=" + JSON.toJSONString(ignorePathList));
+        log.debug("ignoreParamValueList=" + JSON.toJSONString(ignoreParamValueList));
+        log.debug("XSS fiter [XSSFilter] init end");
+    }
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException
+    {
+        log.debug("XSS fiter [XSSFilter] starting");
+        // 判断uri是否包含项目名称
+        String uriPath = ((HttpServletRequest) request).getRequestURI();
+        if (isIgnorePath(uriPath))
+        {
+            log.debug("ignore xssfilter,path[" + uriPath + "] pass through XssFilter, go ahead...");
+            chain.doFilter(request, response);
+            return;
+        }
+        else
+        {
+            log.debug("has xssfiter path[" + uriPath + "] need XssFilter, go to XssRequestWrapper");
+            //传入重写后的Request
+            chain.doFilter(new XssRequestWrapper((HttpServletRequest) request, ignoreParamValueList), response);
+        }
+        log.debug("XSS fiter [XSSFilter] stop");
+    }
+
+    @Override
+    public void destroy()
+    {
+        log.debug("XSS fiter [XSSFilter] destroy");
+    }
+
+    /**
+     * 是否为忽略的请求路径
+     *
+     * @param servletPath servlet路径
+     * @return boolean
+     */
+    private boolean isIgnorePath(String servletPath)
+    {
+        if (servletPath == null || servletPath.equals(""))
+        {
+            return true;
+        }
+        if (ignorePathList == null || ignorePathList.size() == 0)
+        {
+            return false;
+        }
+        else
+        {
+            for (String ignorePath : ignorePathList)
+            {
+                if (!(ignorePath == null || ignorePath.equals("")) && servletPath.contains(ignorePath.trim()))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
+```
+
+
+
+
+
+第七步：拷贝之前的service包到此项目中，并更改
+
+
+
+```java
+package mao.tools_xss.service;
+
+import org.owasp.validator.html.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+import java.io.InputStream;
+
+/**
+ * Project name(项目名称)：antiSamy_demo
+ * Package(包名): mao.antisamy_demo.service
+ * Class(类名): XssFilterService
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/30
+ * Time(创建时间)： 15:43
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class XssFilterService
+{
+    /**
+     * 策略文件 需要将要使用的策略文件放到项目资源文件路径下
+     */
+    @SuppressWarnings("all")
+    private static final String antiSamyPath = "antisamy-slashdot-1.4.4.xml";
+
+    public static Policy policy = null;
+
+    private static final Logger log = LoggerFactory.getLogger(XssFilterService.class);
+
+    static
+    {
+        // 指定策略文件
+        try
+        {
+            InputStream inputStream = XssFilterService.class.getClassLoader().getResourceAsStream(antiSamyPath);
+            assert inputStream != null;
+            policy = Policy.getInstance(inputStream);
+        }
+        catch (PolicyException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * AntiSamy过滤数据
+     *
+     * @param taintedHTML 需要进行过滤的数据
+     * @return 返回过滤后的数据
+     */
+    public String xssClean(String taintedHTML)
+    {
+        try
+        {
+            // 使用AntiSamy进行过滤
+            AntiSamy antiSamy = new AntiSamy();
+            CleanResults cleanResults = antiSamy.scan(taintedHTML, policy);
+            taintedHTML = cleanResults.getCleanHTML();
+        }
+        catch (ScanException | PolicyException e)
+        {
+            e.printStackTrace();
+        }
+        return taintedHTML;
+    }
+}
+
+```
+
+
+
+
+
+
+
+
+
+第八步：编写配置类XssAuthConfiguration
+
+
+
+```java
+package mao.tools_xss.config;
+
+import mao.tools_xss.converter.XssStringJsonDeserializer;
+import mao.tools_xss.filter.XssFilter;
+import mao.tools_xss.service.XssFilterService;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringJoiner;
+
+/**
+ * Project name(项目名称)：AntiSamy_spring_boot_starter_demo
+ * Package(包名): mao.tools_xss.config
+ * Class(类名): XssAuthConfiguration
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/30
+ * Time(创建时间)： 20:31
+ * Version(版本): 1.0
+ * Description(描述)： XSS 跨站攻击自动配置
+ */
+
+@Configuration
+public class XssAuthConfiguration
+{
+    /**
+     * 配置跨站攻击 反序列化处理器
+     *
+     * @return Jackson2ObjectMapperBuilderCustomizer
+     */
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer2()
+    {
+        return builder -> builder.deserializerByType(String.class, new XssStringJsonDeserializer());
+    }
+
+
+    /**
+     * 配置跨站攻击过滤器
+     *
+     * @return FilterRegistrationBean
+     */
+    @Bean
+    public FilterRegistrationBean<XssFilter> filterRegistrationBean()
+    {
+        //可以拓展
+
+        FilterRegistrationBean<XssFilter> filterRegistration = new FilterRegistrationBean<>(new XssFilter());
+        filterRegistration.addUrlPatterns("/*");
+        filterRegistration.setOrder(1);
+
+        Map<String, String> initParameters = new HashMap<>(2);
+        String excludes = new StringJoiner(",")
+                .add("/favicon.ico")
+                .add("/doc.html")
+                .add("/swagger-ui.html")
+                .add("/csrf")
+                .add("/webjars/*")
+                .add("/v2/*")
+                .add("/swagger-resources/*")
+                .add("/resources/*")
+                .add("/static/*")
+                .add("/public/*")
+                .add("/classpath:*")
+                .add("/actuator/*")
+                .toString();
+        initParameters.put("excludes", excludes);
+        initParameters.put("isIncludeRichText", "true");
+        filterRegistration.setInitParameters(initParameters);
+        return filterRegistration;
+    }
+
+    @Bean
+    public XssFilterService xssFilterService()
+    {
+        return new XssFilterService();
+    }
+}
+
+```
+
+
+
+
+
+
+
+第九步：拷贝antisamy-slashdot-1.4.4.xml文件和antisamy.xsd文件到资源目录中
+
+
+
+![image-20221030203845215](img/AntiSamy学习笔记/image-20221030203845215.png)
+
+
+
+这两个文件在这里没有什么用，就是为了复制
+
+
+
+
+
+第十步：编写spring.factories文件
+
+
+
+![image-20221030204025573](img/AntiSamy学习笔记/image-20221030204025573.png)
+
+
+
+
+
+```
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    mao.tools_xss.config.XssAuthConfiguration
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 使用starter
+
+
+
+第一步：导入tools-xss的依赖
+
+
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>AntiSamy_spring_boot_starter_demo</artifactId>
+        <groupId>mao</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>use-starter</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>use-starter</name>
+    <description>use-starter</description>
+
+    <properties>
+
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>mao</groupId>
+            <artifactId>tools-xss</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+
+
+
+
+第二步：导入之前项目的静态资源文件
+
+
+
+![image-20221030204417008](img/AntiSamy学习笔记/image-20221030204417008.png)
+
+
+
+
+
+第三步：拷贝antisamy-slashdot-1.4.4.xml文件和antisamy.xsd文件到资源目录中
+
+
+
+![image-20221030204631750](img/AntiSamy学习笔记/image-20221030204631750.png)
+
+
+
+
+
+
+
+第四步：拷贝之前的controller和entity包到此项目中
+
+
+
+![image-20221030205333887](img/AntiSamy学习笔记/image-20221030205333887.png)
+
+
+
+
+
+第五步：修改配置文件application.yml
+
+
+
+```yaml
+  # 开启debug模式，输出调试信息，常用于检查系统运行状况
+  #debug: true
+
+  # 设置日志级别，root表示根节点，即整体应用日志级别
+logging:
+ # 日志输出到文件的文件名
+  file:
+     name: server.log
+  # 字符集
+  charset:
+    file: UTF-8
+  # 分文件
+  logback:
+    rollingpolicy:
+      #最大文件大小
+      max-file-size: 16KB
+      # 文件格式
+      file-name-pattern: logs/server_log/%d{yyyy/MM月/dd日/}%i.log
+  # 设置日志组
+  group:
+  # 自定义组名，设置当前组中所包含的包
+    mao_pro: mao
+  level:
+    root: info
+    # 为对应组设置日志级别
+    mao_pro: debug
+    # 日志输出格式
+# pattern:
+  # console: "%d %clr(%p) --- [%16t] %clr(%-40.40c){cyan} : %m %n"
+```
+
+
 
 
 
