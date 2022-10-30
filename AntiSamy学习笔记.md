@@ -3188,6 +3188,44 @@ import java.util.List;
 
 public class XssStringJsonDeserializer extends JsonDeserializer<String>
 {
+
+    private static final List<String> list = new ArrayList<>();
+
+    static
+    {
+        list.add("<script>");
+        list.add("</script>");
+        list.add("<iframe>");
+        list.add("</iframe>");
+        list.add("<noscript>");
+        list.add("</noscript>");
+        list.add("<frameset>");
+        list.add("</frameset>");
+        list.add("<frame>");
+        list.add("</frame>");
+        list.add("<noframes>");
+        list.add("</noframes>");
+        list.add("<h1>");
+        list.add("</h1>");
+        list.add("<h2>");
+        list.add("</h2>");
+        list.add("<h3>");
+        list.add("</h3>");
+        list.add("<h4>");
+        list.add("</h4>");
+        list.add("<h5>");
+        list.add("</h5>");
+        list.add("<h6>");
+        list.add("</h6>");
+        list.add("<img>");
+        list.add("</img>");
+        list.add("<table>");
+        list.add("</table>");
+        list.add("<form>");
+        list.add("</form>");
+    }
+
+
     @Override
     public String deserialize(JsonParser p, DeserializationContext dc) throws IOException, JsonProcessingException
     {
@@ -3200,19 +3238,6 @@ public class XssStringJsonDeserializer extends JsonDeserializer<String>
                 return value;
             }
 
-            List<String> list = new ArrayList<>();
-            list.add("<script>");
-            list.add("</script>");
-            list.add("<iframe>");
-            list.add("</iframe>");
-            list.add("<noscript>");
-            list.add("</noscript>");
-            list.add("<frameset>");
-            list.add("</frameset>");
-            list.add("<frame>");
-            list.add("</frame>");
-            list.add("<noframes>");
-            list.add("</noframes>");
             boolean flag = list.stream().anyMatch(value::contains);
             if (flag)
             {
@@ -3223,6 +3248,7 @@ public class XssStringJsonDeserializer extends JsonDeserializer<String>
         return null;
     }
 }
+
 ```
 
 
@@ -3753,6 +3779,154 @@ logging:
 
 
 第六步：启动程序
+
+
+
+```sh
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v2.7.1)
+
+2022-10-30 21:39:24.175  INFO 18896 --- [           main] mao.use_starter.UseStarterApplication    : Starting UseStarterApplication using Java 16.0.2 on mao with PID 18896 (H:\程序\大四上期\AntiSamy_spring_boot_starter_demo\use-starter\target\classes started by mao in H:\程序\大四上期\AntiSamy_spring_boot_starter_demo)
+2022-10-30 21:39:24.177 DEBUG 18896 --- [           main] mao.use_starter.UseStarterApplication    : Running with Spring Boot v2.7.1, Spring v5.3.21
+2022-10-30 21:39:24.178  INFO 18896 --- [           main] mao.use_starter.UseStarterApplication    : No active profile set, falling back to 1 default profile: "default"
+2022-10-30 21:39:24.830  INFO 18896 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2022-10-30 21:39:24.842  INFO 18896 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-10-30 21:39:24.842  INFO 18896 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.64]
+2022-10-30 21:39:24.924  INFO 18896 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-10-30 21:39:24.925  INFO 18896 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 709 ms
+2022-10-30 21:39:24.956 DEBUG 18896 --- [           main] mao.tools_xss.filter.XssFilter           : XSS fiter [XSSFilter] init start ...
+2022-10-30 21:39:24.981 DEBUG 18896 --- [           main] mao.tools_xss.filter.XssFilter           : ignorePathList=null
+2022-10-30 21:39:24.982 DEBUG 18896 --- [           main] mao.tools_xss.filter.XssFilter           : ignoreParamValueList=["samlp:LogoutRequest"]
+2022-10-30 21:39:24.982 DEBUG 18896 --- [           main] mao.tools_xss.filter.XssFilter           : XSS fiter [XSSFilter] init end
+2022-10-30 21:39:25.153  INFO 18896 --- [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2022-10-30 21:39:25.264  INFO 18896 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2022-10-30 21:39:25.275  INFO 18896 --- [           main] mao.use_starter.UseStarterApplication    : Started UseStarterApplication in 1.427 seconds (JVM running for 2.046)
+```
+
+
+
+
+
+
+
+第七步：访问
+
+
+
+![image-20221030214019875](img/AntiSamy学习笔记/image-20221030214019875.png)
+
+
+
+
+
+```sh
+2022-10-30 21:39:45.985  INFO 18896 --- [nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2022-10-30 21:39:45.989 DEBUG 18896 --- [nio-8080-exec-2] mao.tools_xss.filter.XssFilter           : XSS fiter [XSSFilter] starting
+2022-10-30 21:39:45.989 DEBUG 18896 --- [nio-8080-exec-1] mao.tools_xss.filter.XssFilter           : XSS fiter [XSSFilter] starting
+2022-10-30 21:39:45.990 DEBUG 18896 --- [nio-8080-exec-1] mao.tools_xss.filter.XssFilter           : has xssfiter path[/student/init] need XssFilter, go to XssRequestWrapper
+2022-10-30 21:39:45.990 DEBUG 18896 --- [nio-8080-exec-2] mao.tools_xss.filter.XssFilter           : has xssfiter path[/] need XssFilter, go to XssRequestWrapper
+2022-10-30 21:39:45.999 DEBUG 18896 --- [nio-8080-exec-2] mao.tools_xss.utils.XssUtils             :  start read XSS configfile [antisamy-slashdot-1.4.4.xml]
+2022-10-30 21:39:46.002  INFO 18896 --- [nio-8080-exec-1] m.u.controller.StudentController         : 初始化完成
+2022-10-30 21:39:46.007 DEBUG 18896 --- [nio-8080-exec-2] mao.tools_xss.utils.XssUtils             : read XSS configfile [antisamy-slashdot-1.4.4.xml] success
+2022-10-30 21:39:46.007 DEBUG 18896 --- [nio-8080-exec-2] mao.tools_xss.utils.XssUtils             : raw value before xssClean: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+2022-10-30 21:39:46.016 DEBUG 18896 --- [nio-8080-exec-1] mao.tools_xss.filter.XssFilter           : XSS fiter [XSSFilter] stop
+2022-10-30 21:39:46.028 DEBUG 18896 --- [nio-8080-exec-2] mao.tools_xss.utils.XssUtils             : xssfilter value after xssCleantext/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+2022-10-30 21:39:46.034 DEBUG 18896 --- [nio-8080-exec-2] mao.tools_xss.utils.XssUtils             : raw value before xssClean: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+2022-10-30 21:39:46.035 DEBUG 18896 --- [nio-8080-exec-2] mao.tools_xss.utils.XssUtils             : xssfilter value after xssCleantext/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+2022-10-30 21:39:46.038 DEBUG 18896 --- [nio-8080-exec-2] mao.tools_xss.filter.XssFilter           : XSS fiter [XSSFilter] stop
+```
+
+
+
+
+
+
+
+![image-20221030214141079](img/AntiSamy学习笔记/image-20221030214141079.png)
+
+
+
+
+
+![image-20221030214204548](img/AntiSamy学习笔记/image-20221030214204548.png)
+
+
+
+
+
+```sh
+2022-10-30 21:41:38.214 DEBUG 18896 --- [nio-8080-exec-6] mao.tools_xss.filter.XssFilter           : XSS fiter [XSSFilter] starting
+2022-10-30 21:41:38.215 DEBUG 18896 --- [nio-8080-exec-6] mao.tools_xss.filter.XssFilter           : has xssfiter path[/student] need XssFilter, go to XssRequestWrapper
+2022-10-30 21:41:38.233 DEBUG 18896 --- [nio-8080-exec-6] mao.tools_xss.utils.XssUtils             : raw value before xssClean: 133<script>alert("xss攻击")</script>
+2022-10-30 21:41:38.235 DEBUG 18896 --- [nio-8080-exec-6] mao.tools_xss.utils.XssUtils             : 出于安全的原因，标记script不被允许。此标记不应该影响输入的显示。
+2022-10-30 21:41:38.236 DEBUG 18896 --- [nio-8080-exec-6] mao.tools_xss.utils.XssUtils             : xssfilter value after xssClean133
+2022-10-30 21:41:38.240  INFO 18896 --- [nio-8080-exec-6] m.u.controller.StudentController         : 添加成功：
+id：111
+name：133
+sex：男
+age：8
+
+2022-10-30 21:41:38.242 DEBUG 18896 --- [nio-8080-exec-6] mao.tools_xss.filter.XssFilter           : XSS fiter [XSSFilter] stop
+```
+
+
+
+
+
+
+
+![image-20221030214306260](img/AntiSamy学习笔记/image-20221030214306260.png)
+
+
+
+
+
+![image-20221030214318803](img/AntiSamy学习笔记/image-20221030214318803.png)
+
+
+
+
+
+```sh
+2022-10-30 21:42:45.463 DEBUG 18896 --- [nio-8080-exec-9] mao.tools_xss.filter.XssFilter           : XSS fiter [XSSFilter] starting
+2022-10-30 21:42:45.464 DEBUG 18896 --- [nio-8080-exec-9] mao.tools_xss.filter.XssFilter           : has xssfiter path[/student] need XssFilter, go to XssRequestWrapper
+2022-10-30 21:42:45.465 DEBUG 18896 --- [nio-8080-exec-9] mao.tools_xss.utils.XssUtils             : raw value before xssClean: <h1>xss攻击</h1>
+2022-10-30 21:42:45.467 DEBUG 18896 --- [nio-8080-exec-9] mao.tools_xss.utils.XssUtils             : The h1 tag has been encoded for security reasons. The contents of the tag will remain in place.
+2022-10-30 21:42:45.467 DEBUG 18896 --- [nio-8080-exec-9] mao.tools_xss.utils.XssUtils             : xssfilter value after xssClean&lt;h1&gt;xss攻击&lt;/h1&gt;
+2022-10-30 21:42:45.468  INFO 18896 --- [nio-8080-exec-9] m.u.controller.StudentController         : 添加成功：
+id：111
+name：&lt;h1&gt;xss攻击&lt;/h1&gt;
+sex：男
+age：9
+
+2022-10-30 21:42:45.469 DEBUG 18896 --- [nio-8080-exec-9] mao.tools_xss.filter.XssFilter           : XSS fiter [XSSFilter] stop
+```
+
+
+
+
+
+
+
+![image-20221030214432455](img/AntiSamy学习笔记/image-20221030214432455.png)
+
+
+
+
+
+
+
+![image-20221030214523877](img/AntiSamy学习笔记/image-20221030214523877.png)
+
+
+
+
 
 
 
