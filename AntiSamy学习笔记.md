@@ -2110,11 +2110,259 @@ Project name(项目名称)：antiSamy_demo
 
 
 
-第十五步：修改StudentController的内容
+第十五步：编写XssFilterService
+
+
+
+```java
+package mao.antisamy_demo.service;
+
+import mao.antisamy_demo.wrapper.XssRequestWrapper;
+import org.owasp.validator.html.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.io.InputStream;
+
+/**
+ * Project name(项目名称)：antiSamy_demo
+ * Package(包名): mao.antisamy_demo.service
+ * Class(类名): XssFilterService
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/30
+ * Time(创建时间)： 15:43
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+@Service
+public class XssFilterService
+{
+    /**
+     * 策略文件 需要将要使用的策略文件放到项目资源文件路径下
+     */
+    @SuppressWarnings("all")
+    private static final String antiSamyPath = "antisamy-ebay.xml";
+
+    public static Policy policy = null;
+
+    private static final Logger log = LoggerFactory.getLogger(XssRequestWrapper.class);
+
+    static
+    {
+        // 指定策略文件
+        try
+        {
+            InputStream inputStream = XssRequestWrapper.class.getClassLoader().getResourceAsStream(antiSamyPath);
+            assert inputStream != null;
+            policy = Policy.getInstance(inputStream);
+        }
+        catch (PolicyException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * AntiSamy过滤数据
+     *
+     * @param taintedHTML 需要进行过滤的数据
+     * @return 返回过滤后的数据
+     */
+    public String xssClean(String taintedHTML)
+    {
+        try
+        {
+            // 使用AntiSamy进行过滤
+            AntiSamy antiSamy = new AntiSamy();
+            CleanResults cleanResults = antiSamy.scan(taintedHTML, policy);
+            taintedHTML = cleanResults.getCleanHTML();
+        }
+        catch (ScanException | PolicyException e)
+        {
+            e.printStackTrace();
+        }
+        return taintedHTML;
+    }
+}
+```
 
 
 
 
+
+第十六步：修改StudentController
+
+
+
+```java
+package mao.antisamy_demo.controller;
+
+import mao.antisamy_demo.entity.Student;
+import mao.antisamy_demo.service.XssFilterService;
+import mao.antisamy_demo.wrapper.XssRequestWrapper;
+import org.apache.juli.logging.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：antiSamy_demo
+ * Package(包名): mao.antisamy_demo.controller
+ * Class(类名): StudentController
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/10/29
+ * Time(创建时间)： 20:05
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+@RestController
+@RequestMapping("/student")
+public class StudentController
+{
+    private static final List<Student> list = Collections.synchronizedList(new ArrayList<>());
+
+    private static final Logger log = LoggerFactory.getLogger(StudentController.class);
+
+    @Autowired
+    private XssFilterService xssFilterService;
+
+    @PostMapping("/init")
+    public synchronized void init()
+    {
+        Student student1 = new Student(10001, "张三", "男", 18);
+        Student student2 = new Student(10002, "李四", "女", 16);
+        Student student3 = new Student(10003, "王五", "男", 20);
+        list.clear();
+        list.add(student1);
+        list.add(student2);
+        list.add(student3);
+        log.info("初始化完成");
+    }
+
+//    @PostMapping
+//    public boolean save(@RequestBody Student student)
+//    {
+//        list.add(student);
+//        log.info("添加成功：\n" + student);
+//        return true;
+//    }
+
+
+    @PostMapping
+    public boolean save(@RequestBody Student student)
+    {
+        student.setName(xssFilterService.xssClean(student.getName()));
+        student.setSex(xssFilterService.xssClean(student.getSex()));
+
+        list.add(student);
+        log.info("添加成功：\n" + student);
+        return true;
+    }
+
+
+    @PostMapping("/sync")
+    public boolean saveSync(Student student)
+    {
+        list.add(student);
+        log.info("添加成功：\n" + student);
+        return true;
+    }
+
+    @GetMapping
+    public List<Student> getAll()
+    {
+        log.info("查询所有：\n" + list);
+        return list;
+    }
+
+}
+```
+
+
+
+
+
+
+
+第十七步：重启并访问
+
+
+
+![image-20221030155942310](img/AntiSamy学习笔记/image-20221030155942310.png)
+
+
+
+
+
+![image-20221030160024280](img/AntiSamy学习笔记/image-20221030160024280.png)
+
+
+
+
+
+![image-20221030160034064](img/AntiSamy学习笔记/image-20221030160034064.png)
+
+
+
+
+
+
+
+![image-20221030160053583](img/AntiSamy学习笔记/image-20221030160053583.png)
+
+
+
+
+
+可以看到脚本代码被清除了
+
+
+
+![image-20221030160142380](img/AntiSamy学习笔记/image-20221030160142380.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 自定义spring boot starter
+
+为了方便使用，需要定义成一个starter，不需要额外进行任何配置就可以使用
+
+
+
+
+
+### 开发starter
 
 
 
