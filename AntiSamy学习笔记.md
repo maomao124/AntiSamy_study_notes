@@ -1254,7 +1254,7 @@ AntiSamy对“恶意代码”的过滤依赖于策略文件。策略文件规定
 
 
 **antisamy-slashdot.xml** 
-用户只能提交下列的html标签：<b>, <u>, <i>, <a>, <blockquote>。
+用户只能提交下列的html标签：\<b>, \<u>, \<i>, \<a>, \<blockquote>。
 
 
 
@@ -3945,14 +3945,6 @@ age：9
 
 
 ![image-20221030214523877](img/AntiSamy学习笔记/image-20221030214523877.png)
-
-
-
-
-
-
-
-
 
 
 
